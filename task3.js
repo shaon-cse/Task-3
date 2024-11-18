@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const prompt = require('prompt-sync')();
+const Table = require('cli-table3');
 
 class Dice {
     constructor(values) {
@@ -63,11 +64,25 @@ class ProbabilityCalculator {
 
 class ProbabilityTable {
     static display(probabilities, diceSets) {
-        console.log("Probability Table:");
-        console.log(" ".repeat(10) + diceSets.map((_, i) => `Dice ${i}`).join(" ".repeat(10)));
-        probabilities.forEach((row, i) => {
-            console.log(`Dice ${i}` + row.map(prob => prob.toFixed(2)).join(" ".repeat(10)));
+        console.log("Probability of the win for the user:");
+        const table = new Table({
+            head: ['User dice v', ...diceSets.map(dice => dice.values.join(','))],
+            colWidths: Array(diceSets.length + 1).fill(15)
         });
+
+        probabilities.forEach((row, i) => {
+            const rowData = [diceSets[i].values.join(',')];
+            row.forEach((prob, j) => {
+                if (i === j) {
+                    rowData.push(`- (${prob.toFixed(4)})`);
+                } else {
+                    rowData.push(prob.toFixed(4));
+                }
+            });
+            table.push(rowData);
+        });
+
+        console.log(table.toString());
     }
 }
 
